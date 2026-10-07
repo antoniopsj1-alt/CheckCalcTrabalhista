@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="keywords" content="Antonio Pereira de Souza Junior, Cálculo trabalhista, Cálculo rescisório, Cálculo de férias, Cálculo de 13º salário, Cálculo de horas extras, Cálculo de adicional noturno, Cálculo de FGTS, Cálculo de IRRF, Cálculo de seguro-desemprego, Prazímetro, Aplicativo trabalhista, Direitos trabalhistas, Legislação trabalhista brasileira">
+<meta name="author" content="Antônio Pereira de Souza Junior">
 <meta name="theme-color" content="#0a3d91">
 <title>CheckCalc Trabalhista</title>
 <script src="https://js.puter.com/v2/"></script>
@@ -51,6 +53,7 @@ code{background:var(--soft);padding:1px 5px;border-radius:5px}
 @media print{body *{visibility:hidden}#rep,#rep *{visibility:visible}#rep{position:absolute;left:0;top:0;width:100%;border:0;color:#000;background:#fff}}
 </style>
 </head>
+
 <body>
 <header><h1>CheckCalc<br>Trabalhista</h1><p>Calcule e confira seus direitos com IA, seguindo a legislação brasileira vigente.</p></header>
 <main>
@@ -71,6 +74,8 @@ code{background:var(--soft);padding:1px 5px;border-radius:5px}
 </section>
 </main>
 <input type="file" id="fi" accept="image/*" hidden>
+
+
 <script>
 // ===== Parâmetros vigentes (atualize aqui quando mudarem) =====
 const PARAM='Salário mínimo 2026: R$ 1.621,00. INSS 2026 progressivo: 7,5% até R$ 1.621,00; 9% até R$ 2.902,84; 12% até R$ 4.354,27; 14% até R$ 8.475,55 (teto). IRRF 2026 (Lei 15.270/2025): isenção efetiva até R$ 5.000,00 com redução gradual até R$ 7.350,00; dedução por dependente R$ 189,59. Se algum valor divergir da tabela oficial na data do cálculo, use a oficial e informe qual usou.';
@@ -183,5 +188,18 @@ h='<div class="big">'+BR(t)+'</div><p>Prazo de '+N+' dia'+(N===1?'':'s')+' '+tp+
 saida('<h2>Prazímetro</h2>'+h+'<p class="aviso">'+(F?'Os dias de feriado informados foram tratados como dias que seriam contados'+(u?' (dias de semana)':'')+'. ':'')+'Confira o prazo na norma ou no contrato que o originou.</p>');
 $('ex').hidden=false;}
 </script>
+
+		<footer style="text-align: center; color: white; font-size: 18px;"> <!-- Início do Rodapé da página -->
+                  <p style="text-align: center;">
+                  <a href="https://antoniopsj1-alt.github.io/Portfolio-AntonioJunior/" target="_blank" style="text-decoration: none; color: inherit;">
+                   &copy; 2026 Antônio Pereira de Souza Junior.
+                  </a>
+                  </p>
+			<p style="text-align: center;">Todos os direitos reservados.</p>
+			<address style="text-align: center; color: blue; text-weight: bold;">
+			 Contato: <a href="mailto:antoniopsj1@gmail.com">antoniopsj1@gmail.com</a>
+			</address> 
+		</footer> <!-- Fim do Rodapé -->
+
 </body>
 </html>
