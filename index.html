@@ -9,7 +9,7 @@
 <style>
 :root{--bg:#eef5ff;--card:#fff;--ink:#0b1f44;--mut:#587099;--b1:#0a3d91;--b2:#1e7ae6;--b3:#7cc4ff;--line:#cfe0fa;--soft:#e3eeff}
 @media(prefers-color-scheme:dark){:root{--bg:#06122b;--card:#0d2147;--ink:#e8f0ff;--mut:#9db4dd;--line:#1c386c;--soft:#12295a}}
-*{box-sizing:border-box}
+*{box-sizing:border-box}[hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding-bottom:env(safe-area-inset-bottom,0px)}
 header{background:linear-gradient(160deg,var(--b1),var(--b2));color:#fff;padding:calc(env(safe-area-inset-top,0px) + 22px) 20px 30px;border-radius:0 0 28px 28px}
 header h1{margin:0;font-size:30px;line-height:1.05;font-weight:800;letter-spacing:-.03em}
@@ -29,6 +29,13 @@ h3.t{font-size:24px;margin:4px 0 4px;letter-spacing:-.02em}
 label{display:block;font-size:14px;color:var(--mut);margin-top:14px}
 input,select{display:block;width:100%;min-height:48px;margin-top:5px;border:1.5px solid var(--line);border-radius:12px;padding:0 12px;background:var(--card);color:var(--ink);font:16px inherit}
 .row{display:flex;gap:8px;margin-top:20px;flex-wrap:wrap}
+.gt{font-size:14px;color:var(--mut);margin-top:14px}
+.rg{display:flex;gap:8px;margin-top:6px}.rg.v{flex-direction:column}
+.rg label{flex:1;margin:0;display:flex;align-items:center;gap:10px;min-height:48px;padding:0 12px;border:1.5px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);font-size:15px;cursor:pointer}
+.rg input{width:20px;min-height:0;margin:0;accent-color:var(--b2)}
+.rg label:has(input:checked){border-color:var(--b2);background:var(--soft);font-weight:700}
+input:disabled{opacity:.45;background:var(--soft)}
+#rep ul{padding-left:20px}
 .btn{flex:1;min-width:130px;min-height:50px;border-radius:12px;border:1.5px solid var(--b2);background:var(--card);color:var(--b2);font:700 15px inherit;cursor:pointer}
 .btn.p{background:linear-gradient(120deg,var(--b1),var(--b2));color:#fff;border:0;flex:2}
 .btn:disabled{opacity:.6}
@@ -93,48 +100,59 @@ noct:{i:'🌙',t:'Adicional noturno',g:3,img:'um contracheque',task:'Calcule o a
 pz:{i:'🧮',t:'Prazímetro',g:0,local:1}
 };
 const GR={0:'Funciona sem internet',1:'Contracheque e verbas',2:'Rescisão e seguro-desemprego',3:'Descontos e adicionais'};
-const PZ=[s('modo','O que deseja?',['Contar dias entre duas datas','Achar a data final de um prazo']),d('ini','Data inicial'),d('fim','Data final'),n('qtd','Quantidade de dias do prazo'),s('tipo','Tipo de dia',['Corridos','Úteis (segunda a sexta)']),s('inc','Dia inicial',['Não contar (exclusive)','Contar (inclusive)']),s('fer','Feriados nacionais',['Não descontar','Descontar nos dias úteis'])];
+const rd=(id,tit,op,sel,v)=>(tit?'<div class="gt">'+tit+'</div>':'')+'<div class="rg'+(v?' v':'')+'">'+op.map((o,i)=>'<label><input type="radio" name="'+id+'" value="'+i+'"'+(i===sel?' checked':'')+'>'+o+'</label>').join('')+'</div>';
+const rv=nm=>+document.querySelector('input[name="'+nm+'"]:checked').value;
+const PZH=()=>rd('modo','O que deseja?',['Contar dias entre datas','Achar a data final de um prazo'],0,1)
++fld(d('ini','Data inicial'))+rd('inc','',['Inclusive (Contar)','Exclusive (Não Contar)'],0)
++fld(d('fim','Data final'))+fld(n('qtd','Quantidade de dias do prazo'))
++rd('tipo','Tipo de dia',['Corridos','Úteis (segunda a sexta)'],0)
++rd('fer','Feriados',['Considerar os feriados','Não considerar os feriados'],0,1)
++fld(n('nfer','Dias de feriado no prazo (número inteiro)'));
 
 // ===== Telas =====
 const hm=$('home');let cur=null,img=null;
 [0,1,2,3].forEach(g=>{hm.insertAdjacentHTML('beforeend','<h2>'+GR[g]+'</h2>'+Object.keys(M).filter(k=>M[k].g===g).map(k=>'<button class="item'+(g?'':' pz')+'" data-k="'+k+'"><i>'+M[k].i+'</i><span><b>'+M[k].t+'</b><small>'+(g?'Cálculo e conferência com IA':'Dias corridos ou úteis, sem internet')+'</small></span></button>').join(''));});
-hm.onclick=e=>{const b=e.target.closest('[data-k]');if(b){history.pushState({},'');abrir(b.dataset.k);}};
+hm.onclick=e=>{const b=e.target.closest('[data-k]');if(b){try{history.pushState({},'');}catch(x){}abrir(b.dataset.k);}};
 function fld([id,l,t,o]){const c=t==='s'?'<select id="'+id+'">'+o.map(x=>'<option>'+x+'</option>').join('')+'</select>':'<input id="'+id+'" type="'+(t==='d'?'date':'text')+'"'+(t!=='d'?' inputmode="decimal"':'')+(t==='m'?' placeholder="0,00"':'')+'>';return '<label>'+l+c+'</label>';}
 function abrir(k){cur=k;img=null;const x=M[k];hm.hidden=true;$('view').hidden=false;$('vt').textContent=x.t;
 $('vd').textContent=x.local?'Conta prazos em dias corridos ou úteis. Não usa IA.':'Preencha o que souber. A IA monta o memorial de cálculo.';
-$('fm').innerHTML=(x.local?PZ:x.f).map(fld).join('');$('rep').hidden=$('ex').hidden=true;
+$('fm').innerHTML=x.local?PZH():x.f.map(fld).join('');$('rep').hidden=$('ex').hidden=true;
 if($('atual'))$('atual').value=hoje;
 $('ac').innerHTML=x.local?'<button class="btn p" id="go">Calcular prazo</button>':'<button class="btn p" id="go">Calcular com IA</button>'+(x.img?'<button class="btn" id="ph">📷 Conferir '+x.img+'</button>':'');
 $('go').onclick=x.local?pz:()=>run();if($('ph'))$('ph').onclick=()=>$('fi').click();
-if(x.local){$('modo').onchange=pzModo;pzModo();}scrollTo(0,0);}
-function pzModo(){const a=$('modo').selectedIndex===0;$('fim').parentElement.hidden=!a;$('qtd').parentElement.hidden=a;}
+if(x.local){$('nfer').value='0';document.querySelectorAll('input[name=modo]').forEach(r=>r.onchange=pzModo);pzModo();}scrollTo(0,0);}
+function pzModo(){const a=rv('modo')===0;$('fim').disabled=!a;$('qtd').disabled=a;}
 function inicio(){$('view').hidden=true;hm.hidden=false;cur=null;}
-$('bk').onclick=()=>history.back();onpopstate=inicio;
+$('bk').onclick=()=>{if(history.state)history.back();else inicio();};onpopstate=inicio;
 ['wn','wc','we'].forEach(i=>{try{$(i).value=localStorage.getItem(i)||'';}catch(e){}$(i).oninput=()=>{try{localStorage.setItem(i,$(i).value);}catch(e){}};});
 
 // ===== IA (Puter) =====
 $('fi').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(f){img=await reduzir(f);run(true);}};
 function reduzir(f){return new Promise(r=>{const im=new Image(),u=URL.createObjectURL(f);im.onload=()=>{const k=Math.min(1,1600/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*k;c.height=im.height*k;c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);r(c.toDataURL('image/jpeg',.85));};im.src=u;});}
 function montar(x,conf){const dados=x.f.map(([id,l])=>l+': '+($(id).value||'não informado')).join('\n');
-return 'Você é especialista em Direito do Trabalho e cálculos trabalhistas do Brasil. Data de hoje: '+new Date().toLocaleDateString('pt-BR')+'. Aplique somente a legislação e as tabelas vigentes na data de referência do cálculo (CLT com a reforma trabalhista, Leis 4.090, 7.998, 8.036, 15.270/2025 e demais normas).\nParâmetros: '+PARAM+'\nRegras úteis: '+NORMAS+'\n\nTAREFA: '+x.t+'. '+x.task+'\nTrabalhador: '+($('wn').value||'não informado')+'\n\nDADOS INFORMADOS:\n'+dados+'\n\nResponda em português, em Markdown, com as seções: ## Resumo (resultado principal em destaque), ## Memorial de cálculo (passo a passo com fórmulas, valores, alíquotas e tabelas usadas; use tabelas quando ajudar), ## Observações legais (convenção coletiva, suposições e dados que faltaram). Valores em R$ com 2 casas. Não invente dados: se faltar algo, diga qual suposição adotou.'+(conf?'\n\nCONFERÊNCIA: a imagem anexa é '+x.img+'. Leia os valores da imagem, refaça o cálculo correto e compare item a item. Finalize com ## Conclusão (CORRETO, COM DIVERGÊNCIAS ou ILEGÍVEL) e o que deve ser contestado ou corrigido.':'');}
+return 'Você é especialista em Direito do Trabalho e cálculos trabalhistas do Brasil. Data de hoje: '+new Date().toLocaleDateString('pt-BR')+'. Aplique somente a legislação e as tabelas vigentes na data de referência do cálculo (CLT com a reforma trabalhista, Leis 4.090, 7.998, 8.036, 15.270/2025 e demais normas).\nParâmetros: '+PARAM+'\nRegras úteis: '+NORMAS+'\n\nTAREFA: '+x.t+'. '+x.task+'\nTrabalhador: '+($('wn').value||'não informado')+'\n\nDADOS INFORMADOS:\n'+dados+'\n\nResponda em português, em Markdown, com as seções: ## Resumo (resultado principal em destaque), ## Memorial de cálculo (passo a passo com fórmulas, valores, alíquotas e tabelas usadas; use tabelas quando ajudar), ## Observações legais (convenção coletiva, suposições e dados que faltaram). Valores em R$ com 2 casas. Escreva para uma pessoa leiga, em frases curtas. NUNCA use LaTeX nem os símbolos $ (de fórmula), barra invertida ou chaves. Escreva fórmulas em texto simples, por exemplo: Valor da hora = Salário ÷ 220. No memorial, use uma tabela com as colunas Item | Como foi calculado | Valor (R$), uma linha por passo, e explique cada passo em uma frase. Não invente dados: se faltar algo, diga qual suposição adotou.'+(conf?'\n\nCONFERÊNCIA: a imagem anexa é '+x.img+'. Leia os valores da imagem, refaça o cálculo correto e compare item a item. Finalize com ## Conclusão (CORRETO, COM DIVERGÊNCIAS ou ILEGÍVEL) e o que deve ser contestado ou corrigido.':'');}
 async function run(conf){const x=M[cur],b=$('go');b.disabled=true;b.textContent='Calculando…';
 saida('<p>⏳ A IA está montando o relatório…</p>');
 try{if(!window.puter)throw new Error('Sem conexão com a IA do Puter. Conecte-se à internet. O Prazímetro funciona sem internet.');
 const r=conf?await puter.ai.chat(montar(x,1),img):await puter.ai.chat(montar(x));
 const c=r&&r.message?r.message.content:r;const txt=typeof c==='string'?c:Array.isArray(c)?c.map(p=>p.text||'').join(''):String(c);
-saida(cab(x.t)+md(txt)+'<p class="aviso">Relatório estimativo gerado por IA. Confira com o contador, o sindicato ou os canais oficiais (gov.br) antes de tomar decisões.</p>',1);
+saida(cab(x.t)+md(limpa(txt))+'<p class="aviso">Relatório estimativo gerado por IA. Confira com o contador, o sindicato ou os canais oficiais (gov.br) antes de tomar decisões.</p>',1);
 }catch(e){saida('<p class="err">'+(e&&e.message?e.message:'Não foi possível concluir. Tente novamente.')+'</p>');}
 b.disabled=false;b.textContent='Calcular com IA';}
 function cab(t){const p=[$('wn').value,$('wc').value,$('we').value].filter(Boolean).join(' · ');return '<h2>'+t+'</h2><p class="meta">'+(p?p+' · ':'')+new Date().toLocaleDateString('pt-BR')+'</p>';}
 function saida(h,ex){$('rep').hidden=false;$('rep').innerHTML=h;$('ex').hidden=!ex;$('rep').scrollIntoView({behavior:'smooth'});}
+function limpa(t){t=t.replace(/\$\$([\s\S]*?)\$\$/g,'$1');
+for(let i=0;i<3;i++)t=t.replace(/\\d?frac\{([^{}]*)\}\{([^{}]*)\}/g,'($1 ÷ $2)').replace(/\\(?:text|mathrm|textbf)\{([^{}]*)\}/g,'$1');
+return t.replace(/\\(?:times|cdot)/g,'×').replace(/\\div/g,'÷').replace(/\\approx/g,'≈').replace(/\\%/g,'%').replace(/\\(?:left|right)/g,'').replace(/\\[()\[\]]/g,'').replace(/\\[,;! ]/g,' ').replace(/\\([a-zA-Z]+)/g,'$1').replace(/<br\s*\/?>/gi,' ');}
 function md(s){const E=t=>t.replace(/&/g,'&amp;').replace(/</g,'&lt;'),I=t=>E(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/`(.+?)`/g,'<code>$1</code>');
 const L=s.split('\n'),o=[];let i=0,q;
 while(i<L.length){const l=L[i];
+if(/^\s*[-*_]{3,}\s*$/.test(l)){i++;continue;}
 if(/^\s*\|/.test(l)){const R=[];while(i<L.length&&/^\s*\|/.test(L[i]))R.push(L[i++]);
 const C=r=>r.trim().replace(/^\||\|$/g,'').split('|').map(c=>I(c.trim()));
 o.push('<div class="tw"><table>'+R.filter(r=>!/^[\s|:-]+$/.test(r)).map((r,k)=>'<tr>'+C(r).map(c=>k?'<td>'+c+'</td>':'<th>'+c+'</th>').join('')+'</tr>').join('')+'</table></div>');continue;}
 if(q=l.match(/^#{1,6}\s+(.*)/))o.push('<h3>'+I(q[1])+'</h3>');
-else if(/^\s*[-*]\s+/.test(l)){const U=[];while(i<L.length&&(q=L[i].match(/^\s*[-*]\s+(.*)/))){U.push('<li>'+I(q[1])+'</li>');i++;}o.push('<ul>'+U.join('')+'</ul>');continue;}
+else if(/^\s*(?:[-*]|\d+[.)])\s+/.test(l)){const U=[];while(i<L.length&&(q=L[i].match(/^\s*([-*]|\d+[.)])\s+(.*)/))){U.push('<li>'+(/\d/.test(q[1])?q[1]+' ':'')+I(q[2])+'</li>');i++;}o.push('<ul>'+U.join('')+'</ul>');continue;}
 else if(l.trim())o.push('<p>'+I(l)+'</p>');
 i++;}
 return o.join('');}
@@ -142,27 +160,27 @@ return o.join('');}
 // ===== Exportar =====
 function baixar(blob,nome){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=nome;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),3000);}
 $('bc').onclick=async()=>{try{await navigator.clipboard.writeText($('rep').innerText);$('bc').textContent='✅ Copiado';}catch(e){$('bc').textContent='Não foi possível copiar';}setTimeout(()=>$('bc').textContent='📋 Copiar',2000);};
-$('bw').onclick=()=>baixar(new Blob(['\ufeff<html xmlns:w="urn:schemas-microsoft-com:office:word"><meta charset="utf-8"><body>'+$('rep').innerHTML+'</body></html>'],{type:'application/msword'}),'relatorio-'+cur+'.doc');
+$('bw').onclick=()=>baixar(new Blob(['\ufeff<html xmlns:w="urn:schemas-microsoft-com:office:word"><meta charset="utf-8"><body>'+$('rep').innerHTML+'<\/body><\/html>'],{type:'application/msword'}),'relatorio-'+cur+'.doc');
 $('bp').onclick=()=>print();
 
 // ===== Prazímetro (sem IA) =====
-const P=s=>{const[a,b,c]=s.split('-').map(Number);return new Date(a,b-1,c);};
-const iso=t=>t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');
-function pascoa(y){const a=y%19,b=Math.floor(y/100),c=y%100,e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-Math.floor(b/4)-g+15)%30,k=c%4,l=(32+2*e+2*Math.floor(c/4)-h-k)%7,mm=Math.floor((a+11*h+22*l)/451),t=h+l-7*mm+114;return new Date(y,Math.floor(t/31)-1,t%31+1);}
-const HC={};
-function ehFeriado(t){const y=t.getFullYear();if(!HC[y]){const S=new Set(['01-01','04-21','05-01','09-07','10-12','11-02','11-15','11-20','12-25'].map(x=>y+'-'+x)),p=pascoa(y);p.setDate(p.getDate()-2);S.add(iso(p));HC[y]=S;}return HC[y].has(iso(t));}
+const P=t=>{const[a,b,c]=t.split('-').map(Number);return new Date(a,b-1,c);};
 const BR=t=>t.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
-function pz(){const a=$('modo').selectedIndex===0,u=$('tipo').selectedIndex===1,inc=$('inc').selectedIndex===1,fe=$('fer').selectedIndex===1;
-if(!$('ini').value)return saida('<p class="err">Informe a data inicial.</p>');
-const conta=t=>!u||(t.getDay()%6!==0&&!(fe&&ehFeriado(t))),ini=P($('ini').value);let h;
-if(a){if(!$('fim').value)return saida('<p class="err">Informe a data final.</p>');
-let fim=P($('fim').value),k=0;if(fim<ini)return saida('<p class="err">A data final é anterior à inicial.</p>');
-for(const t=new Date(ini);t<=fim;t.setDate(t.getDate()+1))if((inc||t>ini)&&conta(t))k++;
-h='<div class="big">'+k+' dia'+(k===1?'':'s')+(u?' úteis':' corridos')+'</div><p>De '+BR(ini)+' até '+BR(fim)+', '+(inc?'contando':'sem contar')+' o dia inicial.</p>';}
-else{const N=parseInt($('qtd').value,10);if(!(N>=0&&N<=36500))return saida('<p class="err">Informe a quantidade de dias.</p>');
-const t=new Date(ini);let k=inc&&conta(ini)?1:0;while(k<N){t.setDate(t.getDate()+1);if(conta(t))k++;}
-h='<div class="big">'+BR(t)+'</div><p>Prazo de '+N+' dia'+(N===1?'':'s')+(u?' úteis':' corridos')+' a partir de '+BR(ini)+', '+(inc?'contando':'sem contar')+' o dia inicial.</p>';}
-saida('<h2>Prazímetro</h2>'+h+'<p class="aviso">'+(u?'Dias úteis: segunda a sexta'+(fe?', sem feriados nacionais (não inclui feriados estaduais e municipais)':', sem descontar feriados')+'. ':'')+'Confira o prazo na norma ou no contrato que o originou.</p>');
+const conta=(t,u)=>!u||t.getDay()%6!==0;
+function contar(ini,fim,u,inc){let k=0;for(const t=new Date(ini);t<=fim;t.setDate(t.getDate()+1))if((inc||t>ini)&&conta(t,u))k++;return k;}
+function dataFinal(ini,N,u,inc){const t=new Date(ini);let k=inc&&conta(t,u)?1:0;while(k<N){t.setDate(t.getDate()+1);if(conta(t,u))k++;}return t;}
+function pz(){const a=rv('modo')===0,inc=rv('inc')===0,u=rv('tipo')===1,fe=rv('fer')===0,E=t=>saida('<p class="err">'+t+'</p>');
+const fv=$('nfer').value.trim(),nf=fv===''?0:Number(fv);
+if(!$('ini').value)return E('Informe a data inicial.');
+if(!Number.isInteger(nf)||nf<0)return E('Dias de feriado deve ser um número inteiro (0 ou mais).');
+const ini=P($('ini').value),F=fe?nf:0,tp=u?'úteis':'corridos',ci=inc?'contando':'sem contar';let h;
+if(a){if(!$('fim').value)return E('Informe a data final.');const fim=P($('fim').value);if(fim<ini)return E('A data final é anterior à inicial.');
+const tot=contar(ini,fim,u,inc),k=Math.max(0,tot-F);
+h='<div class="big">'+k+' dia'+(k===1?'':'s')+' '+tp+'</div><p>De '+BR(ini)+' até '+BR(fim)+', '+ci+' o dia inicial.</p>'+(F?'<p>Total no período: '+tot+' · feriados descontados: '+F+'.</p>':'');}
+else{const qv=$('qtd').value.trim(),N=qv===''?NaN:Number(qv);if(!Number.isInteger(N)||N<0||N>36500)return E('Informe a quantidade de dias (número inteiro).');
+const t=dataFinal(ini,N+F,u,inc);
+h='<div class="big">'+BR(t)+'</div><p>Prazo de '+N+' dia'+(N===1?'':'s')+' '+tp+' a partir de '+BR(ini)+', '+ci+' o dia inicial.</p>'+(F?'<p>Somando '+F+' dia(s) de feriado, foram contados '+(N+F)+' dias.</p>':'');}
+saida('<h2>Prazímetro</h2>'+h+'<p class="aviso">'+(F?'Os dias de feriado informados foram tratados como dias que seriam contados'+(u?' (dias de semana)':'')+'. ':'')+'Confira o prazo na norma ou no contrato que o originou.</p>');
 $('ex').hidden=false;}
 </script>
 </body>
