@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a3d91">
+<title>CheckCalc Trabalhista</title>
+<script src="https://js.puter.com/v2/"></script>
+<style>
+:root{--bg:#eef5ff;--card:#fff;--ink:#0b1f44;--mut:#587099;--b1:#0a3d91;--b2:#1e7ae6;--b3:#7cc4ff;--line:#cfe0fa;--soft:#e3eeff}
+@media(prefers-color-scheme:dark){:root{--bg:#06122b;--card:#0d2147;--ink:#e8f0ff;--mut:#9db4dd;--line:#1c386c;--soft:#12295a}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding-bottom:env(safe-area-inset-bottom,0px)}
+header{background:linear-gradient(160deg,var(--b1),var(--b2));color:#fff;padding:calc(env(safe-area-inset-top,0px) + 22px) 20px 30px;border-radius:0 0 28px 28px}
+header h1{margin:0;font-size:30px;line-height:1.05;font-weight:800;letter-spacing:-.03em}
+header p{margin:8px 0 0;opacity:.88;font-size:14px;max-width:34ch}
+main{max-width:520px;margin:0 auto;padding:16px}
+details{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:18px}
+summary{font-weight:700;cursor:pointer}
+h2{font-size:15px;font-weight:700;color:var(--mut);margin:20px 4px 8px}
+.item{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:var(--card);color:var(--ink);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:8px;font:inherit;min-height:60px;cursor:pointer}
+.item i{font-style:normal;font-size:22px;width:44px;height:44px;border-radius:12px;background:var(--soft);display:grid;place-items:center;flex:none}
+.item b{display:block;font-size:16px}.item small{color:var(--mut);font-size:13px}
+.item.pz{background:linear-gradient(120deg,var(--b1),var(--b2));color:#fff;border:0}
+.item.pz i{background:rgba(255,255,255,.2)}.item.pz small{color:#dcecff}
+.item:focus-visible,.btn:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--b3);outline-offset:2px}
+.back{background:none;border:0;color:var(--b2);font:600 16px inherit;padding:8px 0;cursor:pointer}
+h3.t{font-size:24px;margin:4px 0 4px;letter-spacing:-.02em}
+label{display:block;font-size:14px;color:var(--mut);margin-top:14px}
+input,select{display:block;width:100%;min-height:48px;margin-top:5px;border:1.5px solid var(--line);border-radius:12px;padding:0 12px;background:var(--card);color:var(--ink);font:16px inherit}
+.row{display:flex;gap:8px;margin-top:20px;flex-wrap:wrap}
+.btn{flex:1;min-width:130px;min-height:50px;border-radius:12px;border:1.5px solid var(--b2);background:var(--card);color:var(--b2);font:700 15px inherit;cursor:pointer}
+.btn.p{background:linear-gradient(120deg,var(--b1),var(--b2));color:#fff;border:0;flex:2}
+.btn:disabled{opacity:.6}
+#rep{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:16px;margin-top:20px}
+#rep h2{color:var(--b1);font-size:20px;margin:0 0 4px}#rep h3{font-size:17px;color:var(--b2);margin:18px 0 6px}
+#rep .meta{color:var(--mut);font-size:13px;margin:0 0 8px}
+#rep .big{font-size:34px;font-weight:800;letter-spacing:-.03em;color:var(--b1);margin:6px 0}
+#rep .aviso{font-size:12px;color:var(--mut);border-top:1px solid var(--line);padding-top:10px;margin-top:16px}
+.tw{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:left}th{background:var(--soft)}
+code{background:var(--soft);padding:1px 5px;border-radius:5px}
+.err{color:#c0392b;font-weight:600}
+@media print{body *{visibility:hidden}#rep,#rep *{visibility:visible}#rep{position:absolute;left:0;top:0;width:100%;border:0;color:#000;background:#fff}}
+</style>
+</head>
+<body>
+<header><h1>CheckCalc<br>Trabalhista</h1><p>Calcule e confira seus direitos com IA, seguindo a legislação brasileira vigente.</p></header>
+<main>
+<details id="wk"><summary>👤 Dados do trabalhador (opcional)</summary>
+<label>Nome<input id="wn" autocomplete="name"></label>
+<label>Cargo / função<input id="wc"></label>
+<label>Empresa<input id="we"></label>
+<p style="font-size:13px;color:var(--mut);margin:10px 0 0">Aparecem apenas no relatório final e ficam salvos só neste aparelho.</p></details>
+<section id="home"></section>
+<section id="view" hidden>
+<button class="back" id="bk">← Voltar</button>
+<h3 class="t" id="vt"></h3><div id="vd" style="color:var(--mut);font-size:14px"></div>
+<div id="fm"></div>
+<div class="row" id="ac"></div>
+<div id="rep" hidden></div>
+<div class="row" id="ex" hidden>
+<button class="btn" id="bc">📋 Copiar</button><button class="btn" id="bw">📄 Word</button><button class="btn" id="bp">🖨️ PDF</button></div>
+</section>
+</main>
+<input type="file" id="fi" accept="image/*" hidden>
+<script>
+// ===== Parâmetros vigentes (atualize aqui quando mudarem) =====
+const PARAM='Salário mínimo 2026: R$ 1.621,00. INSS 2026 progressivo: 7,5% até R$ 1.621,00; 9% até R$ 2.902,84; 12% até R$ 4.354,27; 14% até R$ 8.475,55 (teto). IRRF 2026 (Lei 15.270/2025): isenção efetiva até R$ 5.000,00 com redução gradual até R$ 7.350,00; dedução por dependente R$ 189,59. Se algum valor divergir da tabela oficial na data do cálculo, use a oficial e informe qual usou.';
+const NORMAS='Aviso prévio: 30 dias + 3 por ano completo (máx. 90). Hora extra: mín. 50%, 100% em domingos/feriados, com reflexo no DSR. Adicional noturno: 20% urbano (22h–5h, hora de 52min30s), 25% rural. Periculosidade 30% do salário-base; insalubridade 10/20/40% do salário mínimo. FGTS 8%; multa 40% (sem justa causa) ou 20% (acordo, art. 484-A). Férias: +1/3, abono de até 1/3, faltas injustificadas reduzem (até 5=30d; 6–14=24d; 15–23=18d; 24–32=12d). 13º: 1/12 por mês com 15+ dias; 1ª parcela 50% sem descontos até 30/11; 2ª com INSS/IRRF até 20/12. Seguro-desemprego (Lei 7.998): 1ª vez 12 meses nos últimos 18; 2ª 9 nos últimos 12; 3ª+ 6 nos últimos 6; 3 a 5 parcelas conforme meses trabalhados; doméstico 15 meses nos últimos 24 e 3 parcelas; só dispensa sem justa causa ou rescisão indireta.';
+const $=id=>document.getElementById(id);
+const hoje=new Date().toISOString().slice(0,10);
+const m=(id,l)=>[id,l,'m'],n=(id,l)=>[id,l,'n'],d=(id,l)=>[id,l,'d'],s=(id,l,o)=>[id,l,'s',o];
+const SAL=m('sal','Salário bruto na carteira (R$)'),DEP=n('dep','Dependentes (filhos)');
+const DESC=m('desc','Outros descontos: adiantamento, VT, VA, atrasos, faltas (R$)');
+const SN=['Não','Sim'];
+const AD=[m('com','Comissões (R$)'),n('he','Horas extras no mês (qtd)'),s('per','Periculosidade (30%)',SN),s('ins','Insalubridade',['Não','10% (mínimo)','20% (médio)','40% (máximo)'])];
+const JOR=s('jor','Jornada semanal',['44h','40h','36h','34h','30h','Outra (informe a quantidade abaixo)']);
+const PERF=s('perf','Perfil',['Trabalhador formal (CLT)','Empregado doméstico']);
+const REC=s('rec','Já recebeu seguro-desemprego antes?',['Não','Sim, 1 vez','Sim, 2 vezes ou mais']);
+const M={
+liq:{i:'💵',t:'Salário líquido',g:1,img:'um contracheque',task:'Calcule o salário líquido do mês (proventos, INSS, IRRF, FGTS informativo e descontos).',f:[SAL,...AD,n('dias','Dias trabalhados no mês (30 = mês inteiro)'),DEP,DESC]},
+resc:{i:'📑',t:'Rescisão trabalhista',g:2,img:'um termo de rescisão (TRCT)',task:'Calcule todas as verbas rescisórias (saldo de salário, aviso prévio, férias + 1/3, 13º proporcional, FGTS e multa, descontos).',f:[s('tipo','Tipo de rescisão',['Sem justa causa','Pedido de demissão','Justa causa','Acordo (art. 484-A)','Rescisão indireta','Término de contrato de experiência','Término de contrato determinado']),SAL,...AD,DEP,DESC,s('av','Aviso prévio',['Trabalhado','Indenizado','Não cumprido pelo empregado','Não se aplica']),d('adm','Data de contratação'),d('dem','Data de demissão (com o aviso prévio)'),s('fv','Férias vencidas não gozadas?',['Não','Sim, 1 período']),m('fgts','Saldo do FGTS (opcional, R$)')]},
+aviso:{i:'⏳',t:'Aviso prévio',g:2,img:'o comunicado de aviso prévio ou TRCT',task:'Calcule o valor do aviso prévio, os dias proporcionais e a data final a cumprir.',f:[SAL,AD[0],AD[1],AD[2],AD[3],DEP,s('av','Tipo de aviso prévio',['Trabalhado (empregador dispensou)','Indenizado','Pedido de demissão do empregado']),d('adm','Data de contratação'),d('dem','Data de desligamento')]},
+he:{i:'🕒',t:'Horas extras',g:1,img:'um contracheque ou folha de ponto',task:'Calcule o valor da hora normal, das horas extras (50% e 100%), o reflexo no DSR e o total.',f:[SAL,AD[0],AD[2],AD[3],JOR,n('jo','Se outra jornada: horas semanais'),n('h50','Horas extras a 50% no mês'),n('h100','Horas extras a 100% (domingos/feriados)'),n('du','Dias úteis do mês'),n('dd','Domingos e feriados do mês'),DEP,DESC]},
+fer:{i:'🏖️',t:'Férias',g:1,img:'um recibo de férias',task:'Calcule o valor das férias (1/3 constitucional, abono pecuniário, descontos e adiantamento do 13º se houver).',f:[SAL,AD[0],AD[1],AD[2],AD[3],n('falt','Faltas não justificadas no período aquisitivo'),DEP,s('ab','Vender 10 dias (1/3) das férias?',SN),s('df','Dias de férias a gozar',['30','20','15','10']),s('a13','Antecipar 1ª parcela do 13º?',SN)]},
+dt:{i:'🎁',t:'13º salário',g:1,img:'um contracheque do 13º',task:'Calcule o 13º salário proporcional e a parcela solicitada, com INSS e IRRF na 2ª parcela.',f:[SAL,AD[0],AD[1],AD[2],AD[3],DEP,n('mes','Meses trabalhados no ano (15+ dias contam)'),s('parc','Parcela a simular',['Única','1ª parcela','2ª parcela'])]},
+sd:{i:'🛟',t:'Seguro-desemprego',g:2,img:'o comprovante ou requerimento do seguro-desemprego',task:'Verifique o direito, calcule o valor das parcelas pela tabela vigente e a quantidade de parcelas.',f:[PERF,REC,m('s1','Salário bruto do 3º último mês (R$)'),m('s2','Salário bruto do 2º último mês (R$)'),m('s3','Salário bruto do último mês (R$)'),d('adm','Data de contratação'),d('dem','Data de demissão'),s('tp','Tipo de dispensa',['Sem justa causa','Rescisão indireta','Outra'])]},
+sdt:{i:'📆',t:'Tempo para o seguro-desemprego',g:2,task:'Calcule o tempo trabalhado, o tempo que falta para cumprir a carência, a porcentagem concluída e a data prevista.',f:[PERF,REC,d('adm','Data de contratação'),d('atual','Data atual')]},
+falta:{i:'🚫',t:'Desconto por falta',g:3,img:'um contracheque',task:'Calcule o desconto por falta injustificada e atrasos, com o DSR perdido (semana completa) e reflexos.',f:[SAL,n('nf','Faltas injustificadas (dias)'),n('atr','Atrasos (horas)'),s('dsr','Perdeu a semana completa (DSR)?',SN),n('hm','Horas mensais da jornada (220 = 44h semanais)')]},
+fgir:{i:'🧾',t:'FGTS e IRRF',g:3,img:'um contracheque',task:'Calcule o depósito mensal de FGTS (8%), o INSS e o IRRF (com a regra vigente e dependentes).',f:[SAL,AD[0],AD[1],AD[2],AD[3],DEP,m('pens','Pensão alimentícia (R$)')]},
+noct:{i:'🌙',t:'Adicional noturno',g:3,img:'um contracheque',task:'Calcule o adicional noturno (hora reduzida, percentual e reflexo no DSR).',f:[SAL,s('rur','Atividade',['Urbana (20%)','Rural lavoura/pecuária (25%)']),n('hm','Horas mensais da jornada (220 = 44h semanais)'),n('hn','Horas noturnas trabalhadas no mês (22h–5h)'),AD[2],AD[3]]},
+pz:{i:'🧮',t:'Prazímetro',g:0,local:1}
+};
+const GR={0:'Funciona sem internet',1:'Contracheque e verbas',2:'Rescisão e seguro-desemprego',3:'Descontos e adicionais'};
+const PZ=[s('modo','O que deseja?',['Contar dias entre duas datas','Achar a data final de um prazo']),d('ini','Data inicial'),d('fim','Data final'),n('qtd','Quantidade de dias do prazo'),s('tipo','Tipo de dia',['Corridos','Úteis (segunda a sexta)']),s('inc','Dia inicial',['Não contar (exclusive)','Contar (inclusive)']),s('fer','Feriados nacionais',['Não descontar','Descontar nos dias úteis'])];
+
+// ===== Telas =====
+const hm=$('home');let cur=null,img=null;
+[0,1,2,3].forEach(g=>{hm.insertAdjacentHTML('beforeend','<h2>'+GR[g]+'</h2>'+Object.keys(M).filter(k=>M[k].g===g).map(k=>'<button class="item'+(g?'':' pz')+'" data-k="'+k+'"><i>'+M[k].i+'</i><span><b>'+M[k].t+'</b><small>'+(g?'Cálculo e conferência com IA':'Dias corridos ou úteis, sem internet')+'</small></span></button>').join(''));});
+hm.onclick=e=>{const b=e.target.closest('[data-k]');if(b){history.pushState({},'');abrir(b.dataset.k);}};
+function fld([id,l,t,o]){const c=t==='s'?'<select id="'+id+'">'+o.map(x=>'<option>'+x+'</option>').join('')+'</select>':'<input id="'+id+'" type="'+(t==='d'?'date':'text')+'"'+(t!=='d'?' inputmode="decimal"':'')+(t==='m'?' placeholder="0,00"':'')+'>';return '<label>'+l+c+'</label>';}
+function abrir(k){cur=k;img=null;const x=M[k];hm.hidden=true;$('view').hidden=false;$('vt').textContent=x.t;
+$('vd').textContent=x.local?'Conta prazos em dias corridos ou úteis. Não usa IA.':'Preencha o que souber. A IA monta o memorial de cálculo.';
+$('fm').innerHTML=(x.local?PZ:x.f).map(fld).join('');$('rep').hidden=$('ex').hidden=true;
+if($('atual'))$('atual').value=hoje;
+$('ac').innerHTML=x.local?'<button class="btn p" id="go">Calcular prazo</button>':'<button class="btn p" id="go">Calcular com IA</button>'+(x.img?'<button class="btn" id="ph">📷 Conferir '+x.img+'</button>':'');
+$('go').onclick=x.local?pz:()=>run();if($('ph'))$('ph').onclick=()=>$('fi').click();
+if(x.local){$('modo').onchange=pzModo;pzModo();}scrollTo(0,0);}
+function pzModo(){const a=$('modo').selectedIndex===0;$('fim').parentElement.hidden=!a;$('qtd').parentElement.hidden=a;}
+function inicio(){$('view').hidden=true;hm.hidden=false;cur=null;}
+$('bk').onclick=()=>history.back();onpopstate=inicio;
+['wn','wc','we'].forEach(i=>{try{$(i).value=localStorage.getItem(i)||'';}catch(e){}$(i).oninput=()=>{try{localStorage.setItem(i,$(i).value);}catch(e){}};});
+
+// ===== IA (Puter) =====
+$('fi').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(f){img=await reduzir(f);run(true);}};
+function reduzir(f){return new Promise(r=>{const im=new Image(),u=URL.createObjectURL(f);im.onload=()=>{const k=Math.min(1,1600/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*k;c.height=im.height*k;c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);r(c.toDataURL('image/jpeg',.85));};im.src=u;});}
+function montar(x,conf){const dados=x.f.map(([id,l])=>l+': '+($(id).value||'não informado')).join('\n');
+return 'Você é especialista em Direito do Trabalho e cálculos trabalhistas do Brasil. Data de hoje: '+new Date().toLocaleDateString('pt-BR')+'. Aplique somente a legislação e as tabelas vigentes na data de referência do cálculo (CLT com a reforma trabalhista, Leis 4.090, 7.998, 8.036, 15.270/2025 e demais normas).\nParâmetros: '+PARAM+'\nRegras úteis: '+NORMAS+'\n\nTAREFA: '+x.t+'. '+x.task+'\nTrabalhador: '+($('wn').value||'não informado')+'\n\nDADOS INFORMADOS:\n'+dados+'\n\nResponda em português, em Markdown, com as seções: ## Resumo (resultado principal em destaque), ## Memorial de cálculo (passo a passo com fórmulas, valores, alíquotas e tabelas usadas; use tabelas quando ajudar), ## Observações legais (convenção coletiva, suposições e dados que faltaram). Valores em R$ com 2 casas. Não invente dados: se faltar algo, diga qual suposição adotou.'+(conf?'\n\nCONFERÊNCIA: a imagem anexa é '+x.img+'. Leia os valores da imagem, refaça o cálculo correto e compare item a item. Finalize com ## Conclusão (CORRETO, COM DIVERGÊNCIAS ou ILEGÍVEL) e o que deve ser contestado ou corrigido.':'');}
+async function run(conf){const x=M[cur],b=$('go');b.disabled=true;b.textContent='Calculando…';
+saida('<p>⏳ A IA está montando o relatório…</p>');
+try{if(!window.puter)throw new Error('Sem conexão com a IA do Puter. Conecte-se à internet. O Prazímetro funciona sem internet.');
+const r=conf?await puter.ai.chat(montar(x,1),img):await puter.ai.chat(montar(x));
+const c=r&&r.message?r.message.content:r;const txt=typeof c==='string'?c:Array.isArray(c)?c.map(p=>p.text||'').join(''):String(c);
+saida(cab(x.t)+md(txt)+'<p class="aviso">Relatório estimativo gerado por IA. Confira com o contador, o sindicato ou os canais oficiais (gov.br) antes de tomar decisões.</p>',1);
+}catch(e){saida('<p class="err">'+(e&&e.message?e.message:'Não foi possível concluir. Tente novamente.')+'</p>');}
+b.disabled=false;b.textContent='Calcular com IA';}
+function cab(t){const p=[$('wn').value,$('wc').value,$('we').value].filter(Boolean).join(' · ');return '<h2>'+t+'</h2><p class="meta">'+(p?p+' · ':'')+new Date().toLocaleDateString('pt-BR')+'</p>';}
+function saida(h,ex){$('rep').hidden=false;$('rep').innerHTML=h;$('ex').hidden=!ex;$('rep').scrollIntoView({behavior:'smooth'});}
+function md(s){const E=t=>t.replace(/&/g,'&amp;').replace(/</g,'&lt;'),I=t=>E(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/`(.+?)`/g,'<code>$1</code>');
+const L=s.split('\n'),o=[];let i=0,q;
+while(i<L.length){const l=L[i];
+if(/^\s*\|/.test(l)){const R=[];while(i<L.length&&/^\s*\|/.test(L[i]))R.push(L[i++]);
+const C=r=>r.trim().replace(/^\||\|$/g,'').split('|').map(c=>I(c.trim()));
+o.push('<div class="tw"><table>'+R.filter(r=>!/^[\s|:-]+$/.test(r)).map((r,k)=>'<tr>'+C(r).map(c=>k?'<td>'+c+'</td>':'<th>'+c+'</th>').join('')+'</tr>').join('')+'</table></div>');continue;}
+if(q=l.match(/^#{1,6}\s+(.*)/))o.push('<h3>'+I(q[1])+'</h3>');
+else if(/^\s*[-*]\s+/.test(l)){const U=[];while(i<L.length&&(q=L[i].match(/^\s*[-*]\s+(.*)/))){U.push('<li>'+I(q[1])+'</li>');i++;}o.push('<ul>'+U.join('')+'</ul>');continue;}
+else if(l.trim())o.push('<p>'+I(l)+'</p>');
+i++;}
+return o.join('');}
+
+// ===== Exportar =====
+function baixar(blob,nome){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=nome;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),3000);}
+$('bc').onclick=async()=>{try{await navigator.clipboard.writeText($('rep').innerText);$('bc').textContent='✅ Copiado';}catch(e){$('bc').textContent='Não foi possível copiar';}setTimeout(()=>$('bc').textContent='📋 Copiar',2000);};
+$('bw').onclick=()=>baixar(new Blob(['\ufeff<html xmlns:w="urn:schemas-microsoft-com:office:word"><meta charset="utf-8"><body>'+$('rep').innerHTML+'</body></html>'],{type:'application/msword'}),'relatorio-'+cur+'.doc');
+$('bp').onclick=()=>print();
+
+// ===== Prazímetro (sem IA) =====
+const P=s=>{const[a,b,c]=s.split('-').map(Number);return new Date(a,b-1,c);};
+const iso=t=>t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');
+function pascoa(y){const a=y%19,b=Math.floor(y/100),c=y%100,e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-Math.floor(b/4)-g+15)%30,k=c%4,l=(32+2*e+2*Math.floor(c/4)-h-k)%7,mm=Math.floor((a+11*h+22*l)/451),t=h+l-7*mm+114;return new Date(y,Math.floor(t/31)-1,t%31+1);}
+const HC={};
+function ehFeriado(t){const y=t.getFullYear();if(!HC[y]){const S=new Set(['01-01','04-21','05-01','09-07','10-12','11-02','11-15','11-20','12-25'].map(x=>y+'-'+x)),p=pascoa(y);p.setDate(p.getDate()-2);S.add(iso(p));HC[y]=S;}return HC[y].has(iso(t));}
+const BR=t=>t.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+function pz(){const a=$('modo').selectedIndex===0,u=$('tipo').selectedIndex===1,inc=$('inc').selectedIndex===1,fe=$('fer').selectedIndex===1;
+if(!$('ini').value)return saida('<p class="err">Informe a data inicial.</p>');
+const conta=t=>!u||(t.getDay()%6!==0&&!(fe&&ehFeriado(t))),ini=P($('ini').value);let h;
+if(a){if(!$('fim').value)return saida('<p class="err">Informe a data final.</p>');
+let fim=P($('fim').value),k=0;if(fim<ini)return saida('<p class="err">A data final é anterior à inicial.</p>');
+for(const t=new Date(ini);t<=fim;t.setDate(t.getDate()+1))if((inc||t>ini)&&conta(t))k++;
+h='<div class="big">'+k+' dia'+(k===1?'':'s')+(u?' úteis':' corridos')+'</div><p>De '+BR(ini)+' até '+BR(fim)+', '+(inc?'contando':'sem contar')+' o dia inicial.</p>';}
+else{const N=parseInt($('qtd').value,10);if(!(N>=0&&N<=36500))return saida('<p class="err">Informe a quantidade de dias.</p>');
+const t=new Date(ini);let k=inc&&conta(ini)?1:0;while(k<N){t.setDate(t.getDate()+1);if(conta(t))k++;}
+h='<div class="big">'+BR(t)+'</div><p>Prazo de '+N+' dia'+(N===1?'':'s')+(u?' úteis':' corridos')+' a partir de '+BR(ini)+', '+(inc?'contando':'sem contar')+' o dia inicial.</p>';}
+saida('<h2>Prazímetro</h2>'+h+'<p class="aviso">'+(u?'Dias úteis: segunda a sexta'+(fe?', sem feriados nacionais (não inclui feriados estaduais e municipais)':', sem descontar feriados')+'. ':'')+'Confira o prazo na norma ou no contrato que o originou.</p>');
+$('ex').hidden=false;}
+</script>
+</body>
+</html>
